@@ -14,8 +14,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Serverless backend URL (hosted on Vercel)
-  const SERVERLESS_URL = "/api/getWeather"; // relative path works on Vercel
+  // SERVERLESS_URL for production
+  const SERVERLESS_URL = "/api/getWeather"; // works on Vercel
 
   const fetchWeather = async (searchCity) => {
     if (!searchCity) return;
@@ -23,13 +23,32 @@ export default function App() {
     setError("");
 
     try {
-      const res = await fetch(`${SERVERLESS_URL}?city=${searchCity}`);
-      const data = await res.json();
+      let data;
 
-      if (data.error) throw new Error(data.error);
+      if (import.meta.env.VITE_WEATHER_API_KEY) {
+        // Local development: fetch directly from WeatherAPI
+        const res = await fetch(
+          `https://api.weatherapi.com/v1/forecast.json?key=${
+            import.meta.env.VITE_WEATHER_API_KEY
+          }&q=${searchCity}&days=5&aqi=no&alerts=no`
+        );
+        const result = await res.json();
 
-      setWeatherData(data.current);
-      setForecastData(data.forecast.forecastday);
+        if (result.error) throw new Error(result.error.message);
+
+        data = {
+          weather: result,
+          forecast: result.forecast.forecastday,
+        };
+      } else {
+        // Production: fetch from serverless function
+        const res = await fetch(`${SERVERLESS_URL}?city=${searchCity}`);
+        data = await res.json();
+        if (data.error) throw new Error(data.error);
+      }
+
+      setWeatherData(data.weather); // .location + .current
+      setForecastData(data.forecast); // forecast array
     } catch (err) {
       setError(err.message || "Failed to fetch data.");
       setWeatherData(null);
@@ -40,16 +59,13 @@ export default function App() {
   };
 
   useEffect(() => {
-    fetchWeather(city); // fetch default city weather on load
+    fetchWeather(city);
   }, []);
 
-  // ---------------- Dark Mode Effect ----------------
+  // ---------------- Dark Mode ----------------
   useEffect(() => {
-    if (darkMode) {
-      document.body.classList.add("dark");
-    } else {
-      document.body.classList.remove("dark");
-    }
+    if (darkMode) document.body.classList.add("dark");
+    else document.body.classList.remove("dark");
   }, [darkMode]);
 
   return (
