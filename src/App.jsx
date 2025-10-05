@@ -8,7 +8,7 @@ import "./App.css";
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(false);
-  const [city, setCity] = useState("New York");
+  const [city, setCity] = useState("Delhi");
   const [weatherData, setWeatherData] = useState(null);
   const [forecastData, setForecastData] = useState([]);
   const [loading, setLoading] = useState(false);
