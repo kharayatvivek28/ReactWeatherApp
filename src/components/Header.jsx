@@ -1,15 +1,26 @@
-// Header.jsx
 import React from "react";
+import logo from "../assets/logo.png";
 
-const Header = () => {
+export default function Header({ darkMode, setDarkMode }) {
   return (
-    <header className="bg-blue-600 text-white shadow-md sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-        {/* App Logo / Title */}
-        <h1 className="text-2xl font-bold tracking-wide">🌤 Weather App</h1>
+    <header className="header">
+      {/* Logo + App Name */}
+      <div className="logo-container">
+        <img src={logo} alt="Logo" className="logo" />
+        <h1>WeatherApp</h1>
       </div>
+
+      {/* Navigation Links */}
+      <nav className="nav-links">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact Us</a>
+      </nav>
+
+      {/* Dark Mode Toggle */}
+      <button className="dark-mode-btn" onClick={() => setDarkMode(!darkMode)}>
+        {darkMode ? "Light Mode" : "Dark Mode"}
+      </button>
     </header>
   );
-};
-
-export default Header;
+}

@@ -1,18 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-const SearchBar = () => {
+export default function SearchBar({ city, setCity, onSearch }) {
+  const [input, setInput] = useState(city);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (input !== city) {
+        setCity(input);
+        onSearch(input);
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [input]);
+
   return (
-    <div style={{ margin: "20px", textAlign: "center" }}>
+    <div className="search-container">
       <input
         type="text"
-        placeholder="Enter city name"
-        style={{ padding: "8px", width: "200px" }}
+        placeholder="Enter city"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
       />
-      <button style={{ padding: "8px 12px", marginLeft: "10px" }}>
-        Search
-      </button>
+      <button onClick={() => onSearch(input)}>Search</button>
     </div>
   );
-};
-
-export default SearchBar;
+}
