@@ -14,7 +14,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
+  // Serverless backend URL (hosted on Vercel)
+  const SERVERLESS_URL = "/api/getWeather"; // relative path works on Vercel
 
   const fetchWeather = async (searchCity) => {
     if (!searchCity) return;
@@ -22,18 +23,13 @@ export default function App() {
     setError("");
 
     try {
-      const weatherRes = await fetch(
-        `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${searchCity}&aqi=no`
-      );
-      const weather = await weatherRes.json();
-      if (weather.error) throw new Error(weather.error.message);
-      setWeatherData(weather);
+      const res = await fetch(`${SERVERLESS_URL}?city=${searchCity}`);
+      const data = await res.json();
 
-      const forecastRes = await fetch(
-        `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${searchCity}&days=5&aqi=no&alerts=no`
-      );
-      const forecast = await forecastRes.json();
-      setForecastData(forecast.forecast.forecastday);
+      if (data.error) throw new Error(data.error);
+
+      setWeatherData(data.current);
+      setForecastData(data.forecast.forecastday);
     } catch (err) {
       setError(err.message || "Failed to fetch data.");
       setWeatherData(null);
